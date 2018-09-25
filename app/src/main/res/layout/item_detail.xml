@@ -1,10 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<!--Adding Text View for the Video URL temporarily-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/item_detail"
-    style="?android:attr/textAppearanceLarge"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ItemDetailFragment" >
+
+    <TextView
+        android:id="@+id/video_url_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        style="?android:attr/textAppearanceSmall"
+        android:autoLink="web"
+        android:linksClickable="true"/>
+
+
+<TextView
+    android:id="@+id/item_detail"
+    style="?android:attr/textAppearanceMedium"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:padding="16dp"
     android:textIsSelectable="true"
-    tools:context=".ItemDetailFragment" />
+    />
+
+</LinearLayout>

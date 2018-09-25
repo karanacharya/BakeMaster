@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,9 @@ public class RecipeListAdapter extends
     }
 
     public interface RecipeAdapterOnClickHandler{
-        void onClick(RecipeData recipeData);
+        void onClick(RecipeData recipeData,
+                     ArrayList<RecipeData.RecipeIngredient> recipeIngredients,
+                     ArrayList<RecipeData.RecipeStep> recipeSteps);
     }
 
     @NonNull
@@ -83,7 +86,16 @@ public class RecipeListAdapter extends
             String recipeName = recipeDataArrayList.get(adapterPosition).getRecipeName();
             recipeData.setRecipeName(recipeName);
 
-            mClickHandler.onClick(recipeData);
+
+            ArrayList<RecipeData.RecipeIngredient> recipeIngredients =
+                    recipeDataArrayList.get(adapterPosition).getRecipeIngredientArrayList();
+
+
+            ArrayList<RecipeData.RecipeStep> recipeSteps =
+                    recipeDataArrayList.get(adapterPosition).getRecipeStepArrayList();
+
+
+            mClickHandler.onClick(recipeData,recipeIngredients,recipeSteps);
 
 
         }

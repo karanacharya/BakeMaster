@@ -9,14 +9,17 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.xy.demomdf.data.RecipeData;
 import com.example.xy.demomdf.dummy.DummyContent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,6 +36,17 @@ public class RecipeDetailActivity extends AppCompatActivity {
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
+
+    private static final String TAG = RecipeDetailActivity.class.getSimpleName();
+    private TextView ingredientsTextView;
+
+    private ArrayList<RecipeData.RecipeIngredient> recipeIngredients;
+    private ArrayList<RecipeData.RecipeStep> recipeSteps;
+
+    private ArrayList<String> stepsInShort;
+
+
+
     private boolean mTwoPane;
 
     @Override
@@ -53,11 +67,32 @@ public class RecipeDetailActivity extends AppCompatActivity {
             }
         });
 
+        recipeIngredients = new ArrayList<>();
+        recipeSteps = new ArrayList<>();
+        stepsInShort = new ArrayList<>();
+        ingredientsTextView = findViewById(R.id.ingredients_tv);
+
+
         Intent intentThatLaunchedMe = getIntent();
         if (intentThatLaunchedMe.hasExtra("recipe_data")){
             RecipeData recipeData = intentThatLaunchedMe.getParcelableExtra("recipe_data");
 
+            getSupportActionBar().setTitle(recipeData.getRecipeName());
+        }
 
+        if (intentThatLaunchedMe.hasExtra("ing_list")){
+            recipeIngredients =
+                    intentThatLaunchedMe.getParcelableArrayListExtra("ing_list");
+
+        }
+
+        if (intentThatLaunchedMe.hasExtra("step_list")){
+            recipeSteps =
+                    intentThatLaunchedMe.getParcelableArrayListExtra("step_list");
+
+            for (int i = 0 ; i < recipeSteps.size() ; i++){
+                stepsInShort.add(recipeSteps.get(i).getShortDescription());
+            }
 
         }
 
@@ -69,28 +104,45 @@ public class RecipeDetailActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
+        ingredientsTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
         View recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this,
+                //DummyContent.ITEMS,
+                stepsInShort,
+                recipeSteps,
+                mTwoPane));
     }
 
     public static class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final RecipeDetailActivity mParentActivity;
-        private final List<DummyContent.DummyItem> mValues;
+        //private final List<DummyContent.DummyItem> mValues;
+        private final ArrayList<String> shortSteps;
+        private final ArrayList<RecipeData.RecipeStep> recipeStepsList;
         private final boolean mTwoPane;
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+
+                String tag = (String) view.getTag();
+                //DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id);
+                    //arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id);
+                    arguments.putString(ItemDetailFragment.ARG_ITEM_ID,tag);
+                    arguments.putParcelableArrayList(ItemDetailFragment.ARG_STEPS_LIST_ID,recipeStepsList);
                     ItemDetailFragment fragment = new ItemDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -99,18 +151,23 @@ public class RecipeDetailActivity extends AppCompatActivity {
                 } else {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
-
+                    //intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
+                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID,tag);
+                    intent.putParcelableArrayListExtra(ItemDetailFragment.ARG_STEPS_LIST_ID,recipeStepsList);
                     context.startActivity(intent);
                 }
             }
         };
 
         SimpleItemRecyclerViewAdapter(RecipeDetailActivity parent,
-                                      List<DummyContent.DummyItem> items,
+                                      //List<DummyContent.DummyItem> items,
+                                      ArrayList<String> shortSteps,
+                                      ArrayList<RecipeData.RecipeStep> recipeSteps,
                                       boolean twoPane) {
-            mValues = items;
+//            mValues = items;
             mParentActivity = parent;
+            this.shortSteps = shortSteps;
+            recipeStepsList = recipeSteps;
             mTwoPane = twoPane;
         }
 
@@ -124,15 +181,18 @@ public class RecipeDetailActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
 
-            holder.mContentView.setText(mValues.get(position).content);
+            //holder.mContentView.setText(mValues.get(position).content);
+            holder.mContentView.setText(shortSteps.get(position));
 
-            holder.itemView.setTag(mValues.get(position));
+            //holder.itemView.setTag(mValues.get(position));
+            holder.itemView.setTag(String.valueOf(position));
             holder.itemView.setOnClickListener(mOnClickListener);
         }
 
         @Override
         public int getItemCount() {
-            return mValues.size();
+            //return mValues.size();
+            return shortSteps.size();
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
@@ -146,3 +206,11 @@ public class RecipeDetailActivity extends AppCompatActivity {
         }
     }
 }
+
+/*
+for (int m = 0; m < recipeIngredients.size(); m++) {
+                    Log.i(TAG, "  Ingredient :  " + recipeIngredients.get(m).getIngredient() +
+                            "    QUANTITY :  " + recipeIngredients.get(m).getQuantity() +
+                            "    MEASURE : " + recipeIngredients.get(m).getMeasure());
+                }
+ */

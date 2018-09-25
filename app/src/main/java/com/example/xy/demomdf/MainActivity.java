@@ -29,9 +29,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
         implements RecipeListAdapter.RecipeAdapterOnClickHandler {
 
+
     public static ArrayList<RecipeData> recipeDataArrayList;
-    public static ArrayList<RecipeData.RecipeIngredient> recipeIngredientArrayList;
-    public static ArrayList<RecipeData.RecipeStep> recipeStepArrayList;
 
     public static RecyclerView recipeListRecyclerView;
     public static RecipeListAdapter recipeListAdapter;
@@ -51,8 +50,6 @@ public class MainActivity extends AppCompatActivity
                 getApplicationContext(),recipeDataArrayList, this
         );
 
-        recipeIngredientArrayList = new ArrayList<>();
-        recipeStepArrayList = new ArrayList<>();
 
         new DownloadBakingRecipesTask().execute(NetworkOps.getSourceUrl().toString());
 
@@ -60,12 +57,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onClick(RecipeData recipeData) {
+    public void onClick(RecipeData recipeData,
+                        ArrayList<RecipeData.RecipeIngredient> recipeIngredients,
+                        ArrayList<RecipeData.RecipeStep> recipeSteps) {
 
         Intent launchDetailScreenIntent = new Intent(this,RecipeDetailActivity.class);
-        launchDetailScreenIntent.putExtra("recipe_data",recipeData);
-        startActivity(launchDetailScreenIntent);
 
+        launchDetailScreenIntent.putExtra("recipe_data",recipeData);
+        launchDetailScreenIntent.putParcelableArrayListExtra("ing_list",recipeIngredients);
+        launchDetailScreenIntent.putParcelableArrayListExtra("step_list",recipeSteps);
+
+        startActivity(launchDetailScreenIntent);
 
     }
 
@@ -136,15 +138,14 @@ public class MainActivity extends AppCompatActivity
                         RecipeData recipeData = new RecipeData(Parcel.obtain());
                         recipeData.setRecipeIndex(Integer.valueOf(recipeId));
                         recipeData.setRecipeName(recipeName);
-                        recipeDataArrayList.add(recipeData);
+
 
 //                        For ingredients array
 
-                        JSONArray ingredientsJsonArray = recipeJsonObject.getJSONArray("ingredients");
+                        JSONArray ingredientsJsonArray = recipeJsonObject
+                                .getJSONArray("ingredients");
 
-                        if (!recipeIngredientArrayList.isEmpty()){
-                            recipeIngredientArrayList.clear();
-                        }
+                        ArrayList<RecipeData.RecipeIngredient> recipeIngredientArrayList = new ArrayList<>();
 
                         for (int j = 0 ; j < ingredientsJsonArray.length() ; j++){
                             JSONObject ingredientJsonObject =
@@ -156,7 +157,7 @@ public class MainActivity extends AppCompatActivity
 
 
                             RecipeData.RecipeIngredient recipeIngredient =
-                                    new RecipeData.RecipeIngredient();
+                                    new RecipeData.RecipeIngredient(Parcel.obtain());
 
                             recipeIngredient.setQuantity(quantity);
                             recipeIngredient.setMeasure(measure);
@@ -166,12 +167,12 @@ public class MainActivity extends AppCompatActivity
 
                         }
 
+                        recipeData.setRecipeIngredientArrayList(recipeIngredientArrayList);
+
 //                        For steps array
 
                         JSONArray stepsJsonArray = recipeJsonObject.getJSONArray("steps");
-                        if (!recipeStepArrayList.isEmpty()){
-                            recipeStepArrayList.clear();
-                        }
+                        ArrayList<RecipeData.RecipeStep> recipeStepArrayList = new ArrayList<>();
 
                         for (int k = 0; k < stepsJsonArray.length() ; k++) {
                             JSONObject stepJsonObject = stepsJsonArray.getJSONObject(k);
@@ -181,7 +182,8 @@ public class MainActivity extends AppCompatActivity
                             String mainDescription = stepJsonObject.getString("description");
                             String videoUrl = stepJsonObject.getString("videoURL");
 
-                            RecipeData.RecipeStep recipeStep = new RecipeData.RecipeStep();
+                            RecipeData.RecipeStep recipeStep =
+                                    new RecipeData.RecipeStep(Parcel.obtain());
                             recipeStep.setId(id);
                             recipeStep.setShortDescription(shortDescription);
                             recipeStep.setMainDescription(mainDescription);
@@ -189,8 +191,13 @@ public class MainActivity extends AppCompatActivity
 
                             recipeStepArrayList.add(recipeStep);
                         }
+                        recipeData.setRecipeStepArrayList(recipeStepArrayList);
+
+                        recipeDataArrayList.add(recipeData);
 
                     }
+
+
 
                     recipeListRecyclerView.setAdapter(recipeListAdapter);
 

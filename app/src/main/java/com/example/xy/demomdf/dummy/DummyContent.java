@@ -1,5 +1,7 @@
 package com.example.xy.demomdf.dummy;
 
+import com.example.xy.demomdf.data.RecipeData;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +19,7 @@ public class DummyContent {
      * An array of sample (dummy) items.
      */
     public static final List<DummyItem> ITEMS = new ArrayList<DummyItem>();
+
 
     /**
      * A map of sample (dummy) items, by ID.
@@ -36,6 +39,9 @@ public class DummyContent {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);
     }
+
+//    content : shortDescription
+//    details : mainDescription
 
     private static DummyItem createDummyItem(int position) {
         return new DummyItem(String.valueOf(position), "Item " + position, makeDetails(position));

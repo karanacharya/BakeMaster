@@ -10,9 +10,13 @@ public class RecipeData implements Parcelable {
     private int recipeIndex;
     private String recipeName;
 
+    public ArrayList<RecipeData.RecipeIngredient> recipeIngredientArrayList;
+    public ArrayList<RecipeData.RecipeStep> recipeStepArrayList;
+
     public RecipeData(Parcel in) {
         recipeIndex = in.readInt();
         recipeName = in.readString();
+
     }
 
     public static final Creator<RecipeData> CREATOR = new Creator<RecipeData>() {
@@ -54,11 +58,45 @@ public class RecipeData implements Parcelable {
         dest.writeString(recipeName);
     }
 
-    public static class RecipeIngredient {
+    public ArrayList<RecipeIngredient> getRecipeIngredientArrayList() {
+        return recipeIngredientArrayList;
+    }
+
+    public void setRecipeIngredientArrayList(ArrayList<RecipeIngredient> recipeIngredientArrayList) {
+        this.recipeIngredientArrayList = recipeIngredientArrayList;
+    }
+
+    public ArrayList<RecipeStep> getRecipeStepArrayList() {
+        return recipeStepArrayList;
+    }
+
+    public void setRecipeStepArrayList(ArrayList<RecipeStep> recipeStepArrayList) {
+        this.recipeStepArrayList = recipeStepArrayList;
+    }
+
+    public static class RecipeIngredient implements Parcelable {
 
         private double quantity;
         private String measure;
         private String ingredient;
+
+        public RecipeIngredient(Parcel in) {
+            quantity = in.readDouble();
+            measure = in.readString();
+            ingredient = in.readString();
+        }
+
+        public static final Creator<RecipeIngredient> CREATOR = new Creator<RecipeIngredient>() {
+            @Override
+            public RecipeIngredient createFromParcel(Parcel in) {
+                return new RecipeIngredient(in);
+            }
+
+            @Override
+            public RecipeIngredient[] newArray(int size) {
+                return new RecipeIngredient[size];
+            }
+        };
 
         public double getQuantity() {
             return quantity;
@@ -83,14 +121,45 @@ public class RecipeData implements Parcelable {
         public void setIngredient(String ingredient) {
             this.ingredient = ingredient;
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeDouble(quantity);
+            dest.writeString(measure);
+            dest.writeString(ingredient);
+        }
     }
 
-    public static class RecipeStep {
+    public static class RecipeStep implements Parcelable {
 
         private int id;
         private String shortDescription;
         private String mainDescription;
         private String videoUrl;
+
+        public RecipeStep(Parcel in) {
+            id = in.readInt();
+            shortDescription = in.readString();
+            mainDescription = in.readString();
+            videoUrl = in.readString();
+        }
+
+        public static final Creator<RecipeStep> CREATOR = new Creator<RecipeStep>() {
+            @Override
+            public RecipeStep createFromParcel(Parcel in) {
+                return new RecipeStep(in);
+            }
+
+            @Override
+            public RecipeStep[] newArray(int size) {
+                return new RecipeStep[size];
+            }
+        };
 
         public int getId() {
             return id;
@@ -122,6 +191,19 @@ public class RecipeData implements Parcelable {
 
         public void setVideoUrl(String videoUrl) {
             this.videoUrl = videoUrl;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeInt(id);
+            dest.writeString(shortDescription);
+            dest.writeString(mainDescription);
+            dest.writeString(videoUrl);
         }
     }
 }
