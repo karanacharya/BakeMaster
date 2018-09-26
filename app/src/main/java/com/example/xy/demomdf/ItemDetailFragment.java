@@ -134,24 +134,26 @@ implements ExoPlayer.EventListener{
     private void setupExoPlayer(String videoURL){
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         TrackSelector trackSelector = new DefaultTrackSelector(new AdaptiveTrackSelection.Factory(bandwidthMeter));
-        exoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector);
+        if (exoPlayer == null) {
+            exoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector);
 
-        Uri videoURI = Uri.parse(videoURL);
+            Uri videoURI = Uri.parse(videoURL);
 
-        DefaultHttpDataSourceFactory dataSourceFactory =
-                new DefaultHttpDataSourceFactory("exoplayer_video");
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-        MediaSource mediaSource = new ExtractorMediaSource(
-                videoURI,
-                dataSourceFactory,
-                extractorsFactory,
-                null,
-                null
-        );
+            DefaultHttpDataSourceFactory dataSourceFactory =
+                    new DefaultHttpDataSourceFactory("exoplayer_video");
+            ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+            MediaSource mediaSource = new ExtractorMediaSource(
+                    videoURI,
+                    dataSourceFactory,
+                    extractorsFactory,
+                    null,
+                    null
+            );
 
-        exoPlayerView.setPlayer(exoPlayer);
-        exoPlayer.prepare(mediaSource);
-        exoPlayer.setPlayWhenReady(true);
+            exoPlayerView.setPlayer(exoPlayer);
+            exoPlayer.prepare(mediaSource);
+            exoPlayer.setPlayWhenReady(true);
+        }
     }
 
     private void releasePlayer(){

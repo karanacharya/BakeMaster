@@ -104,9 +104,24 @@ public class RecipeDetailActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
+
         ingredientsTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mTwoPane){
+                    Bundle args = new Bundle();
+                    args.putParcelableArrayList(IngredientsFragment.ARG_INGREDIENTS_ID,recipeIngredients);
+                    IngredientsFragment ingredientsFragment = new IngredientsFragment();
+
+                    ingredientsFragment.setArguments(args);
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.item_detail_container,ingredientsFragment)
+                            .commit();
+                }else{
+                    Intent intent = new Intent(getApplicationContext(),IngredientsActivity.class);
+                    intent.putParcelableArrayListExtra(IngredientsFragment.ARG_INGREDIENTS_ID,recipeIngredients);
+                    startActivity(intent);
+                }
 
             }
         });
