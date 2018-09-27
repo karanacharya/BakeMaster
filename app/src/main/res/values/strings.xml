@@ -2,4 +2,7 @@
     <string name="app_name">BakeMaster</string>
     <string name="title_item_detail">Item Detail</string>
     <string name="ingredients">Ingredients</string>
+    <string name="recipe_ingredients">RECIPE_INGREDIENTS</string>
+    <string name="ingredients_extra">ING_EXTRA</string>
+    <string name="from_widget">Came from Widget</string>
 </resources>

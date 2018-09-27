@@ -38,6 +38,20 @@
                 android:value="com.example.xy.demomdf.RecipeDetailActivity" />
         </activity>
         <activity android:name=".IngredientsActivity"></activity>
+
+        <receiver android:name=".Widget.BakeWidgetProvider"
+            android:label="BakeWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/bake_widget_info"/>
+
+        </receiver>
+
+        <service android:name=".Widget.BakeWidgetService"/>
     </application>
 
 </manifest>

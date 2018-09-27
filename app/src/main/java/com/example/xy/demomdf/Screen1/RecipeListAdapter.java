@@ -1,8 +1,14 @@
 package com.example.xy.demomdf.Screen1;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,9 +17,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.xy.demomdf.R;
+import com.example.xy.demomdf.Widget.BakeWidgetService;
 import com.example.xy.demomdf.data.RecipeData;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class RecipeListAdapter extends
         RecyclerView.Adapter<RecipeListAdapter.RecipeListViewHolder> {
@@ -50,7 +60,7 @@ public class RecipeListAdapter extends
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecipeListViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final RecipeListViewHolder holder, int position) {
         holder.recipeNameText.setText(recipeDataArrayList.get(position).getRecipeName());
     }
 
@@ -93,6 +103,29 @@ public class RecipeListAdapter extends
 
             ArrayList<RecipeData.RecipeStep> recipeSteps =
                     recipeDataArrayList.get(adapterPosition).getRecipeStepArrayList();
+
+            SharedPreferences.Editor editor =
+                    context.getSharedPreferences(context.getString(R.string.recipe_ingredients),
+                            Context.MODE_PRIVATE
+                    ).edit();
+
+            StringBuilder builder = new StringBuilder();
+            for (RecipeData.RecipeIngredient ingredient : recipeIngredients){
+                String quantity = String.valueOf(ingredient.getQuantity());
+                String measure = ingredient.getMeasure();
+                String ingredientName = ingredient.getIngredient();
+
+                String line = ingredientName + " (" + quantity + " " + measure + " ) ";
+                builder.append(line + "\n");
+            }
+            editor.putString(context.getString(R.string.ingredients_extra),builder.toString());
+            editor.apply();
+
+            if (Build.VERSION.SDK_INT > 25){
+                BakeWidgetService.startActionRecipeO(context);
+            } else{
+                BakeWidgetService.startActionRecipe(context);
+            }
 
 
             mClickHandler.onClick(recipeData,recipeIngredients,recipeSteps);
