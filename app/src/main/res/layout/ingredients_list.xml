@@ -14,6 +14,8 @@
         android:layout_height="wrap_content"
         android:textSize="25dp"
         android:textStyle="bold"
+        app:fontFamily="@font/allerta"
+        android:textColor="@color/appColor"
         android:textAppearance="?android:attr/textAppearanceListItem"
         android:padding="16dp"
         android:textIsSelectable="true"

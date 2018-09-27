@@ -3,16 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/cardview_light_background"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:layout_width="match_parent"
-        android:text="You recently viewed :"
+        android:text="You recently viewed for:"
         android:layout_gravity="center"
         android:gravity="center"
         android:layout_margin="4dp"
         android:padding="4dp"
-        android:fontFamily="sans-serif-smallcaps"
+        app:fontFamily="@font/allerta"
+        android:textColor="@color/appColor"
         android:textStyle="bold"
         android:textSize="15sp"
         android:layout_height="wrap_content"
@@ -24,6 +26,8 @@
         android:layout_margin="4dp"
         android:layout_gravity="center"
         android:layout_height="wrap_content"
+        app:fontFamily="@font/allerta"
+        android:textColor="@color/appColor"
         android:layout_width="wrap_content"
         android:textAppearance="?android:attr/textAppearanceListItem" />
 

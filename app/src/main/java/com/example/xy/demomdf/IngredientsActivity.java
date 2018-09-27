@@ -23,15 +23,6 @@ public class IngredientsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
          */
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.ing_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
        /*
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

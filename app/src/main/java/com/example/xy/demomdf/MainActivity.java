@@ -57,21 +57,35 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         recipeListRecyclerView = findViewById(R.id.recipe_list_recycler_view);
         recipeListRecyclerView.setHasFixedSize(true);
 
-        recipeListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        if (findViewById(R.id.main_coordinator_layout_tablet) == null) {
+            recipeListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            snackbar = Snackbar.make(findViewById(R.id.main_coordinator_layout),
+                    "No Internet connection!", Snackbar.LENGTH_INDEFINITE);
+        } else {
+//            Tablet mode
+            recipeListRecyclerView.setLayoutManager(new GridLayoutManager(this,2));
+            snackbar = Snackbar.make(findViewById(R.id.main_coordinator_layout_tablet),
+                    "No Internet connection!", Snackbar.LENGTH_INDEFINITE);
+        }
+
 
         recipeDataArrayList = new ArrayList<>();
         recipeListAdapter = new RecipeListAdapter(
                 getApplicationContext(),recipeDataArrayList, this
         );
 
-        snackbar = Snackbar.make(findViewById(R.id.main_coordinator_layout),
-                "No Internet connection!", Snackbar.LENGTH_INDEFINITE);
+
 
         noResultToast = Toast.makeText(getApplicationContext(), "No results!",Toast.LENGTH_LONG);
 

@@ -19,7 +19,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textSize="25sp"
-            android:fontFamily="sans-serif-smallcaps"
+            android:textColor="@color/appColor"
+            app:fontFamily="@font/allerta"
             android:text="@string/ingredients"
             android:layout_margin="16dp"
             android:textAppearance="?attr/textAppearanceListItem"/>
