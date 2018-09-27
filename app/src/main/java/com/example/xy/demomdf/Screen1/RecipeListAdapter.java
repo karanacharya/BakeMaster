@@ -115,7 +115,7 @@ public class RecipeListAdapter extends
                 String measure = ingredient.getMeasure();
                 String ingredientName = ingredient.getIngredient();
 
-                String line = ingredientName + " (" + quantity + " " + measure + " ) ";
+                String line = "\u2022" + ingredientName + " (" + quantity + " " + measure + " ) ";
                 builder.append(line + "\n");
             }
             editor.putString(context.getString(R.string.ingredients_extra),builder.toString());

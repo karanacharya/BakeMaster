@@ -8,30 +8,19 @@
     android:orientation="vertical"
     tools:context=".ItemDetailFragment">
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/exo_card_view"
+    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+        android:id="@+id/exo_player_view"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        app:cardCornerRadius="10dp">
-
-        <com.google.android.exoplayer2.ui.SimpleExoPlayerView
-            android:id="@+id/exo_player_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </com.google.android.exoplayer2.ui.SimpleExoPlayerView>
+        android:layout_height="match_parent">
+    </com.google.android.exoplayer2.ui.SimpleExoPlayerView>
 
 
-    </android.support.v7.widget.CardView>
-
-
-
-<TextView
+    <TextView
     android:id="@+id/item_detail"
     style="?android:attr/textAppearanceMedium"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    android:textIsSelectable="true"
-    />
+    android:textIsSelectable="true" />
 
 </LinearLayout>

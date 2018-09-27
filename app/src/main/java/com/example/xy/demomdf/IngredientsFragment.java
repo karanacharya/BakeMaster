@@ -53,7 +53,17 @@ public class IngredientsFragment extends Fragment {
 
         TextView ingList = rootView.findViewById(R.id.list_ing);
         if (recipeIngredients != null   || recipeIngredients.size() !=0){
-            ingList.setText(recipeIngredients.get(0).getIngredient());
+            StringBuilder builder = new StringBuilder();
+            for (RecipeData.RecipeIngredient ingredient : recipeIngredients){
+                String quantity = String.valueOf(ingredient.getQuantity());
+                String measure = ingredient.getMeasure();
+                String ingredientName = ingredient.getIngredient();
+
+                String line = "\u2022" + ingredientName + " (" + quantity + " " + measure + " ) ";
+                builder.append(line + "\n");
+            }
+            String ingredientsListString = builder.toString();
+            ingList.setText(ingredientsListString);
         }
 
         return rootView;

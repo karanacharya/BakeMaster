@@ -1,15 +1,18 @@
 package com.example.xy.demomdf;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v7.widget.CardView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.xy.demomdf.data.RecipeData;
@@ -41,8 +44,7 @@ import java.util.ArrayList;
  * in two-pane mode (on tablets) or a {@link ItemDetailActivity}
  * on handsets.
  */
-public class ItemDetailFragment extends Fragment
-implements ExoPlayer.EventListener{
+public class ItemDetailFragment extends Fragment {
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.
@@ -50,6 +52,8 @@ implements ExoPlayer.EventListener{
 
     private SimpleExoPlayerView exoPlayerView;
     private SimpleExoPlayer exoPlayer;
+    private CardView exoCardView;
+    private TextView mainDescriptionTextView;
 
     public static final String ARG_ITEM_ID = "item_id";
 
@@ -103,14 +107,16 @@ implements ExoPlayer.EventListener{
 
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.item_detail, container, false);
 
-        TextView mainDescriptionTextView = rootView.findViewById(R.id.item_detail);
+        mainDescriptionTextView = rootView.findViewById(R.id.item_detail);
 
         exoPlayerView = rootView.findViewById(R.id.exo_player_view);
+        exoCardView = rootView.findViewById(R.id.exo_card_view);
 
         // Show the dummy content as text in a TextView.
         /*
@@ -122,7 +128,7 @@ implements ExoPlayer.EventListener{
 
         if (recipeSteps != null || recipeSteps.size() != 0) {
             String videoUrl = recipeSteps.get(Integer.valueOf(tag)).getVideoUrl();
-            if (videoUrl != null    || !videoUrl.equals(""))
+            if (videoUrl != null || !videoUrl.equals(""))
                 setupExoPlayer(videoUrl);
             String mainDescription = recipeSteps.get(Integer.valueOf(tag)).getMainDescription();
             mainDescriptionTextView.setText(mainDescription);
@@ -131,7 +137,7 @@ implements ExoPlayer.EventListener{
     }
 
 
-    private void setupExoPlayer(String videoURL){
+    private void setupExoPlayer(String videoURL) {
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         TrackSelector trackSelector = new DefaultTrackSelector(new AdaptiveTrackSelection.Factory(bandwidthMeter));
         if (exoPlayer == null) {
@@ -156,51 +162,44 @@ implements ExoPlayer.EventListener{
         }
     }
 
-    private void releasePlayer(){
+    private void releasePlayer() {
         exoPlayer.stop();
         exoPlayer.release();
         exoPlayer = null;
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
         releasePlayer();
     }
 
     @Override
-    public void onTimelineChanged(Timeline timeline, Object manifest) {
-
+    public void onStop() {
+        super.onStop();
+        if (exoPlayer != null)
+            releasePlayer();
     }
 
     @Override
-    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (exoPlayer != null)
+            releasePlayer();
     }
 
     @Override
-    public void onLoadingChanged(boolean isLoading) {
-
+    public void onDetach() {
+        super.onDetach();
+        if (exoPlayer != null)
+            releasePlayer();
     }
 
     @Override
-    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-
-
-    }
-
-    @Override
-    public void onPlayerError(ExoPlaybackException error) {
-
-    }
-
-    @Override
-    public void onPositionDiscontinuity() {
-
-    }
-
-    @Override
-    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-
+    public void onDestroy() {
+        super.onDestroy();
+        if (exoPlayer != null)
+            releasePlayer();
     }
 }
+
