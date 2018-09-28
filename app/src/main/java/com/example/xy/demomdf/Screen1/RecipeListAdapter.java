@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.xy.demomdf.R;
@@ -62,6 +63,20 @@ public class RecipeListAdapter extends
     @Override
     public void onBindViewHolder(@NonNull final RecipeListViewHolder holder, int position) {
         holder.recipeNameText.setText(recipeDataArrayList.get(position).getRecipeName());
+
+        String recipeServings = "Serves : " +
+                String.valueOf(recipeDataArrayList.get(position).getServings());
+        holder.recipeServingsText.setText(recipeServings);
+
+        String imageUrl = recipeDataArrayList.get(position).getImageUrl();
+        if (imageUrl.isEmpty()  || imageUrl == null || imageUrl.equals("")){
+            Log.i("MainActivity","Image url empty.");
+        } else{
+//            if Image url not empty
+            Picasso.get()
+                    .load(imageUrl)
+                    .into(holder.recipeImage);
+        }
     }
 
     @Override
@@ -76,12 +91,15 @@ public class RecipeListAdapter extends
     class RecipeListViewHolder extends RecyclerView.ViewHolder
     implements View.OnClickListener{
 
-        TextView recipeNameText;
+        TextView recipeNameText,recipeServingsText;
+        ImageView recipeImage;
 
         public RecipeListViewHolder(View itemView) {
             super(itemView);
 
             recipeNameText = itemView.findViewById(R.id.recipeNameText);
+            recipeServingsText = itemView.findViewById(R.id.recipe_servings_text);
+            recipeImage = itemView.findViewById(R.id.recipe_image_iv);
             itemView.setOnClickListener(this);
         }
 
@@ -95,6 +113,12 @@ public class RecipeListAdapter extends
 
             String recipeName = recipeDataArrayList.get(adapterPosition).getRecipeName();
             recipeData.setRecipeName(recipeName);
+
+            int recipeServings = recipeDataArrayList.get(adapterPosition).getServings();
+            recipeData.setServings(recipeServings);
+
+            String recipeImageUrl = recipeDataArrayList.get(adapterPosition).getImageUrl();
+            recipeData.setImageUrl(recipeImageUrl);
 
 
             ArrayList<RecipeData.RecipeIngredient> recipeIngredients =

@@ -46,99 +46,60 @@ public class MainActivity extends AppCompatActivity
     public static RecyclerView recipeListRecyclerView;
     public static RecipeListAdapter recipeListAdapter;
 
-    public final String LIST_STATE_KEY = "list_state_key";
-    private static Bundle mBundleRecyclerViewState;
-
     private Snackbar snackbar;
     private Toast noResultToast,noConnectionToast;
 
     public static ProgressBar progressBar;
+    private static boolean isTablet;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        recipeListRecyclerView = findViewById(R.id.recipe_list_recycler_view);
-        recipeListRecyclerView.setHasFixedSize(true);
+        noResultToast = Toast.makeText(getApplicationContext(), "No results!", Toast.LENGTH_LONG);
 
-        if (findViewById(R.id.main_coordinator_layout_tablet) == null) {
-            recipeListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        noConnectionToast = Toast.makeText(getApplicationContext(), "No connectivity manager!", Toast.LENGTH_LONG);
+
+        progressBar = findViewById(R.id.mProgressBar);
+
+        if (findViewById(R.id.main_coordinator_layout_tablet) == null){
+            isTablet = false;
             snackbar = Snackbar.make(findViewById(R.id.main_coordinator_layout),
                     "No Internet connection!", Snackbar.LENGTH_INDEFINITE);
         } else {
-//            Tablet mode
-            recipeListRecyclerView.setLayoutManager(new GridLayoutManager(this,2));
+            isTablet = true;
             snackbar = Snackbar.make(findViewById(R.id.main_coordinator_layout_tablet),
                     "No Internet connection!", Snackbar.LENGTH_INDEFINITE);
         }
 
+            recipeListRecyclerView = findViewById(R.id.recipe_list_recycler_view);
+            recipeListRecyclerView.setHasFixedSize(true);
 
-        recipeDataArrayList = new ArrayList<>();
-        recipeListAdapter = new RecipeListAdapter(
-                getApplicationContext(),recipeDataArrayList, this
-        );
+            recipeDataArrayList = new ArrayList<>();
+
+            recipeListAdapter = new RecipeListAdapter(
+                    getApplicationContext(), recipeDataArrayList, this
+            );
+
+            RecyclerView.LayoutManager mLayoutManager;
+            if (isTablet){
+                mLayoutManager = new GridLayoutManager(this,2);
+
+            } else {
+                mLayoutManager = new LinearLayoutManager(this);
+
+            }
+
+            recipeListRecyclerView.setLayoutManager(mLayoutManager);
+            recipeListRecyclerView.setAdapter(recipeListAdapter);
 
 
+            startWorking();
 
-        noResultToast = Toast.makeText(getApplicationContext(), "No results!",Toast.LENGTH_LONG);
-
-        noConnectionToast = Toast.makeText(getApplicationContext(), "No connectivity manager!",Toast.LENGTH_LONG);
-
-        progressBar = findViewById(R.id.mProgressBar);
-        startWorking();
-
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        Log.i("onPause","in onPause");
-
-        mBundleRecyclerViewState = new Bundle();
-        Log.i("MainActivity","Bundle initiated");
-        Parcelable listState = recipeListRecyclerView.getLayoutManager().onSaveInstanceState();
-        mBundleRecyclerViewState.putParcelable(LIST_STATE_KEY,listState);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        Log.i("onResume","in onResume");
-
-        if (mBundleRecyclerViewState != null){
-            Parcelable listState = mBundleRecyclerViewState.getParcelable(LIST_STATE_KEY);
-            recipeListRecyclerView.getLayoutManager().onRestoreInstanceState(listState);
-        }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            recipeListRecyclerView.setLayoutManager(new GridLayoutManager(this,2));
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-            recipeListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
     }
 
     public void startWorking(){
@@ -260,6 +221,7 @@ public class MainActivity extends AppCompatActivity
 
             progressBar.setVisibility(View.GONE);
 
+
             if (result != null){
 //            if recipes present online,
 
@@ -278,10 +240,14 @@ public class MainActivity extends AppCompatActivity
 
                         String recipeId = recipeJsonObject.getString("id");
                         String recipeName = recipeJsonObject.getString("name");
+                        String servings = recipeJsonObject.getString("servings");
+                        String imageUrl = recipeJsonObject.getString("image");
 
                         RecipeData recipeData = new RecipeData(Parcel.obtain());
                         recipeData.setRecipeIndex(Integer.valueOf(recipeId));
                         recipeData.setRecipeName(recipeName);
+                        recipeData.setServings(Integer.valueOf(servings));
+                        recipeData.setImageUrl(imageUrl);
 
 
 //                        For ingredients array
@@ -325,6 +291,7 @@ public class MainActivity extends AppCompatActivity
                             String shortDescription = stepJsonObject.getString("shortDescription");
                             String mainDescription = stepJsonObject.getString("description");
                             String videoUrl = stepJsonObject.getString("videoURL");
+                            String thumbnailUrl = stepJsonObject.getString("thumbnailURL");
 
                             RecipeData.RecipeStep recipeStep =
                                     new RecipeData.RecipeStep(Parcel.obtain());
@@ -332,6 +299,7 @@ public class MainActivity extends AppCompatActivity
                             recipeStep.setShortDescription(shortDescription);
                             recipeStep.setMainDescription(mainDescription);
                             recipeStep.setVideoUrl(videoUrl);
+                            recipeStep.setThumbnailUrl(thumbnailUrl);
 
                             recipeStepArrayList.add(recipeStep);
                         }
@@ -340,8 +308,6 @@ public class MainActivity extends AppCompatActivity
                         recipeDataArrayList.add(recipeData);
 
                     }
-
-
 
                     recipeListRecyclerView.setAdapter(recipeListAdapter);
 
@@ -352,4 +318,5 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
+
 }

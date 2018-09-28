@@ -2,21 +2,27 @@ package com.example.xy.demomdf;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.media.session.PlaybackState;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.xy.demomdf.data.RecipeData;
 import com.example.xy.demomdf.dummy.DummyContent;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -36,6 +42,8 @@ import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 /**
@@ -59,6 +67,10 @@ public class ItemDetailFragment extends Fragment {
 
     public static final String ARG_STEPS_LIST_ID = "steps_list_id";
 
+    private String videoUrl;
+    private long currentPosition;
+    private ImageView thumbnailImageView;
+
     /**
      * The dummy content this fragment is presenting.
      */
@@ -66,6 +78,7 @@ public class ItemDetailFragment extends Fragment {
 
     private ArrayList<RecipeData.RecipeStep> recipeSteps;
     private String tag;
+    private String appBarLayoutTitle;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -77,6 +90,7 @@ public class ItemDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         recipeSteps = new ArrayList<>();
 
@@ -96,13 +110,13 @@ public class ItemDetailFragment extends Fragment {
                     activity.findViewById(R.id.toolbar_layout);
 
             tag = getArguments().getString(ARG_ITEM_ID);
+            appBarLayoutTitle = recipeSteps.get(Integer.valueOf(tag)).getShortDescription();
             if (appBarLayout != null) {
-                //appBarLayout.setTitle(mItem.content);
-                appBarLayout.setTitle(recipeSteps.get(Integer.valueOf(tag)).getShortDescription());
-
+                appBarLayout.setTitle(appBarLayoutTitle);
             }
 
         }
+
 
 
     }
@@ -113,7 +127,13 @@ public class ItemDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.item_detail, container, false);
 
+        currentPosition = C.TIME_UNSET;
+        if (savedInstanceState != null) {
+            currentPosition = savedInstanceState.getLong("CURRENT_POSITION",C.TIME_UNSET);
+        }
+
         mainDescriptionTextView = rootView.findViewById(R.id.item_detail);
+        thumbnailImageView = rootView.findViewById(R.id.thumbnail_iv);
 
         exoPlayerView = rootView.findViewById(R.id.exo_player_view);
         exoCardView = rootView.findViewById(R.id.exo_card_view);
@@ -127,13 +147,28 @@ public class ItemDetailFragment extends Fragment {
 
 
         if (recipeSteps != null || recipeSteps.size() != 0) {
-            String videoUrl = recipeSteps.get(Integer.valueOf(tag)).getVideoUrl();
-            if (videoUrl != null || !videoUrl.equals(""))
+            videoUrl = recipeSteps.get(Integer.valueOf(tag)).getVideoUrl();
+            if (videoUrl != null || !videoUrl.equals("")) {
                 setupExoPlayer(videoUrl);
+            }
             String mainDescription = recipeSteps.get(Integer.valueOf(tag)).getMainDescription();
             mainDescriptionTextView.setText(mainDescription);
+
+            String thumbnailUrl = recipeSteps.get(Integer.valueOf(tag)).getThumbnailUrl();
+            if (thumbnailUrl.isEmpty() || thumbnailUrl.equals("") || thumbnailUrl == null){
+                Log.i("ItemDetailFragment","Thumbnail Url is null");
+            } else {
+                thumbnailImageView.setVisibility(View.VISIBLE);
+                Picasso.get()
+                        .load(thumbnailUrl)
+                        .into(thumbnailImageView);
+            }
+
         }
+
         return rootView;
+
+
     }
 
 
@@ -157,10 +192,31 @@ public class ItemDetailFragment extends Fragment {
             );
 
             exoPlayerView.setPlayer(exoPlayer);
+            if (currentPosition != C.TIME_UNSET){
+                exoPlayer.seekTo(currentPosition);
+            }
             exoPlayer.prepare(mediaSource);
             exoPlayer.setPlayWhenReady(true);
         }
     }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong("CURRENT_POSITION",currentPosition);
+    }
+
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        currentPosition = C.TIME_UNSET;
+        if (savedInstanceState != null) {
+            currentPosition = savedInstanceState.getLong("CURRENT_POSITION",C.TIME_UNSET);
+        }
+
+    }
+
 
     private void releasePlayer() {
         exoPlayer.stop();
@@ -168,38 +224,23 @@ public class ItemDetailFragment extends Fragment {
         exoPlayer = null;
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (videoUrl != null){
+            setupExoPlayer(videoUrl);
+        }
+    }
+
     @Override
     public void onPause() {
         super.onPause();
-        releasePlayer();
-    }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (exoPlayer != null)
+        if (exoPlayer != null){
+            currentPosition = exoPlayer.getCurrentPosition();
             releasePlayer();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (exoPlayer != null)
-            releasePlayer();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        if (exoPlayer != null)
-            releasePlayer();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (exoPlayer != null)
-            releasePlayer();
+        }
     }
 }
 

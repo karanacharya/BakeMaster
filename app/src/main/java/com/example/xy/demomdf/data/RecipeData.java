@@ -9,6 +9,8 @@ public class RecipeData implements Parcelable {
 
     private int recipeIndex;
     private String recipeName;
+    private int servings;
+    private String imageUrl;
 
     public ArrayList<RecipeData.RecipeIngredient> recipeIngredientArrayList;
     public ArrayList<RecipeData.RecipeStep> recipeStepArrayList;
@@ -16,6 +18,8 @@ public class RecipeData implements Parcelable {
     public RecipeData(Parcel in) {
         recipeIndex = in.readInt();
         recipeName = in.readString();
+        servings = in.readInt();
+        imageUrl = in.readString();
 
     }
 
@@ -56,6 +60,8 @@ public class RecipeData implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(recipeIndex);
         dest.writeString(recipeName);
+        dest.writeInt(servings);
+        dest.writeString(imageUrl);
     }
 
     public ArrayList<RecipeIngredient> getRecipeIngredientArrayList() {
@@ -72,6 +78,22 @@ public class RecipeData implements Parcelable {
 
     public void setRecipeStepArrayList(ArrayList<RecipeStep> recipeStepArrayList) {
         this.recipeStepArrayList = recipeStepArrayList;
+    }
+
+    public int getServings() {
+        return servings;
+    }
+
+    public void setServings(int servings) {
+        this.servings = servings;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public static class RecipeIngredient implements Parcelable {
@@ -141,12 +163,14 @@ public class RecipeData implements Parcelable {
         private String shortDescription;
         private String mainDescription;
         private String videoUrl;
+        private String thumbnailUrl;
 
         public RecipeStep(Parcel in) {
             id = in.readInt();
             shortDescription = in.readString();
             mainDescription = in.readString();
             videoUrl = in.readString();
+            thumbnailUrl = in.readString();
         }
 
         public static final Creator<RecipeStep> CREATOR = new Creator<RecipeStep>() {
@@ -204,6 +228,15 @@ public class RecipeData implements Parcelable {
             dest.writeString(shortDescription);
             dest.writeString(mainDescription);
             dest.writeString(videoUrl);
+            dest.writeString(thumbnailUrl);
+        }
+
+        public String getThumbnailUrl() {
+            return thumbnailUrl;
+        }
+
+        public void setThumbnailUrl(String thumbnailUrl) {
+            this.thumbnailUrl = thumbnailUrl;
         }
     }
 }
