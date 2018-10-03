@@ -11,8 +11,12 @@ As a working Android developer, one often has to create and implement apps where
 Concepts implemented :
 	
 MediaPlayer/Exoplayer to display videos.
+
 Handling error cases in Android.
+
 Adding a widget to the app experience.
+
 Leveraging a third-party library in your app.
+
 Using Fragments to create a responsive design that works on phones and tablets.
 
